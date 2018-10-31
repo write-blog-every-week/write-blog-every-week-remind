@@ -10,21 +10,25 @@ import (
 /**
  * ブログを書いていないユーザーを取得する
  */
-func FindTargetUserList(allMemberData []database.WriteBlogEveryWeek, targetMonday time.Time) map[string]int {
+func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) map[string]int {
 	// 日本時間に合わせる
 	locale, _ := time.LoadLocation("Asia/Tokyo")
 	parser := gofeed.NewParser()
 
 	results := map[string]int{}
-	for i := 0; i < len(allMemberData); i++ {
-		results[allMemberData[i].UserID] = 0
-		for j := 0; j < allMemberData[i].RequireCount; j++ {
+	for i := 0; i < len(allMemberDataList); i++ {
+		for j := 0; j < allMemberDataList[i].RequireCount; j++ {
 			// 最新フィードの公開日を取得する
-			latestPublishDate := getLatestFeedPubDate(allMemberData[i].FeedURL, j, parser, locale)
+			latestPublishDate := getLatestFeedPubDate(allMemberDataList[i].FeedURL, j, parser, locale)
 
 			// 今週の月曜日がAfterになる = 今週ブログを書いていない
 			if targetMonday.After(latestPublishDate) {
-				results[allMemberData[i].UserID]++
+				if _, ok := results[allMemberDataList[i].UserID]; !ok {
+					// データがない場合は初期化
+					results[allMemberDataList[i].UserID] = 0
+				}
+
+				results[allMemberDataList[i].UserID]++
 			}
 		}
 	}

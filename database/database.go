@@ -18,13 +18,12 @@ type WriteBlogEveryWeek struct {
 }
 
 /**
- * DynamoDBからデータを取得する
- * RequireCountが1以上のもののみ
+ * DynamoDBからデータを全取得する
  */
-func FindByMemberData(configData config.ConfigData) []WriteBlogEveryWeek {
+func FindAll(configData config.ConfigData) []WriteBlogEveryWeek {
 	var writeBlogEveryWeek []WriteBlogEveryWeek
 	table := getTableObject(configData)
-	err := table.Scan().Filter("require_count >= ?", 1).All(&writeBlogEveryWeek)
+	err := table.Scan().All(&writeBlogEveryWeek)
 	if err != nil {
 		panic("データの読み込みエラー => " + err.Error())
 	}
@@ -45,15 +44,15 @@ func FindByPK(configData config.ConfigData, pk string) WriteBlogEveryWeek {
 /**
  * ブログの必要記事数を更新する
  */
-func UpdateRequireCount(configData config.ConfigData, allMemberData []WriteBlogEveryWeek, targetUserList map[string]int) {
+func UpdateRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) {
 	table := getTableObject(configData)
-	for i := 0; i < len(allMemberData); i++ {
-		findRequireCount := allMemberData[i].RequireCount
-		currentRequireCount := targetUserList[allMemberData[i].UserID]
+	for i := 0; i < len(allMemberDataList); i++ {
+		findRequireCount := allMemberDataList[i].RequireCount
+		currentRequireCount := targetUserList[allMemberDataList[i].UserID]
 		if findRequireCount != currentRequireCount {
 			// 食い違っている = 少なくとも1記事以上は書いているはず
-			allMemberData[i].RequireCount = currentRequireCount
-			err := table.Put(allMemberData[i]).Run()
+			allMemberDataList[i].RequireCount = currentRequireCount
+			err := table.Put(allMemberDataList[i]).Run()
 			if err != nil {
 				panic("データ保存エラー => " + err.Error())
 			}
@@ -64,19 +63,22 @@ func UpdateRequireCount(configData config.ConfigData, allMemberData []WriteBlogE
 /**
  * ブログの必要記事数をリフレッシュする
  */
-func ResetRequireCount(configData config.ConfigData, allMemberData []WriteBlogEveryWeek, targetUserList map[string]int) map[string]int {
+func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) map[string]int {
 	table := getTableObject(configData)
-	for i := 0; i < len(allMemberData); i++ {
+	results := map[string]int{}
+	for i := 0; i < len(allMemberDataList); i++ {
 		// 0の人は1になり、1以上の人は1記事増える
-		targetUserList[allMemberData[i].UserID]++
-		allMemberData[i].RequireCount = targetUserList[allMemberData[i].UserID]
-		err := table.Put(allMemberData[i]).Run()
+		targetUserList[allMemberDataList[i].UserID]++
+		allMemberDataList[i].RequireCount = targetUserList[allMemberDataList[i].UserID]
+		err := table.Put(allMemberDataList[i]).Run()
 		if err != nil {
 			panic("データ保存エラー => " + err.Error())
 		}
+
+		results[allMemberDataList[i].UserID] = allMemberDataList[i].RequireCount
 	}
 
-	return targetUserList
+	return results
 }
 
 /**

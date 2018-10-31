@@ -38,10 +38,10 @@ func blogReminder() {
 	const targetHour int = 15
 	thisMonday := date.GetThisMonday(targetHour)
 	configData := config.GetConfigData()
-	allMemberData := database.FindByMemberData(configData)
-	targetUserList := rss.FindTargetUserList(allMemberData, thisMonday)
+	allMemberDataList := database.FindAll(configData)
+	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
 	sendText := message.MakeReminderSendText(targetUserList)
-	database.UpdateRequireCount(configData, allMemberData, targetUserList)
+	database.UpdateRequireCount(configData, allMemberDataList, targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
@@ -75,9 +75,9 @@ func blogResult() {
 	const targetHour int = 0
 	lastWeekMonday := date.GetLastWeekMonday(targetHour)
 	configData := config.GetConfigData()
-	allMemberData := database.FindByMemberData(configData)
-	targetUserList := rss.FindTargetUserList(allMemberData, lastWeekMonday)
-	targetUserList = database.ResetRequireCount(configData, allMemberData, targetUserList)
+	allMemberDataList := database.FindAll(configData)
+	targetUserList := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
+	targetUserList = database.ResetRequireCount(configData, allMemberDataList, targetUserList)
 	sendText := message.MakeResultSendText(targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
