@@ -20,4 +20,5 @@
 /Godeps/
 
 *.toml
+*.zip
 # End of https://www.gitignore.io/api/go
