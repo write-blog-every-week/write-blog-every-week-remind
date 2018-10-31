@@ -1,0 +1,1 @@
+# WriteBlogEveryWeekの通知ロジック一式
