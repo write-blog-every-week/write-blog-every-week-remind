@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 
 	config "../config"
 )
@@ -75,6 +76,8 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 	result.UserID = params["user_id"][0]
 	result.UserName = params["user_name"][0]
 	result.Text = params["text"][0]
+	result.Text = strings.TrimLeft(result.Text, "<")
+	result.Text = strings.TrimRight(result.Text, ">")
 
 	return
 }
