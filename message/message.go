@@ -6,9 +6,7 @@ import (
 	"strings"
 )
 
-/**
- * Slackへリマインダーを送信する用のメッセージを作成する
- */
+// MakeReminderSendText Slackへリマインダーを送信する用のメッセージを作成する
 func MakeReminderSendText(targetUserList map[string]int) string {
 	textData := fmt.Sprintf(`
 <!channel>
@@ -22,9 +20,7 @@ func MakeReminderSendText(targetUserList map[string]int) string {
 	return textData
 }
 
-/**
- * Slackへ先週の結果を送信するようのメッセージを作成する
- */
+// MakeResultSendText Slackへ先週の結果を送信するようのメッセージを作成する
 func MakeResultSendText(targetUserList map[string]int) string {
 	textData := fmt.Sprintf(`
 <!channel>
@@ -38,9 +34,7 @@ func MakeResultSendText(targetUserList map[string]int) string {
 	return textData
 }
 
-/**
- * リマインダー用の置換文字列リストを取得する
- */
+// getReminderReplaceMessageList リマインダー用の置換文字列リストを取得する
 func getReminderReplaceMessageList(targetUserList map[string]int) []string {
 	var results []string
 	for key, val := range targetUserList {

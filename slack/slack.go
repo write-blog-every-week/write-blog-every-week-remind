@@ -10,9 +10,7 @@ import (
 	config "../config"
 )
 
-/**
- * Slackからのパラメータ格納構造体
- */
+// SlackParams Slackからのリクエストを格納する構造体
 type SlackParams struct {
 	Token    string
 	UserID   string
@@ -20,9 +18,7 @@ type SlackParams struct {
 	Text     string
 }
 
-/**
- * Slackの特定チャンネルにメッセージを投稿する
- */
+// SendMessage Slackの特定チャンネルにメッセージを投稿する
 func SendMessage(configData config.ConfigData, sendText string) {
 	// JSONとしてパラメータを設定
 	jsonStr := `{"text":"` + sendText + `","channel":"` + configData.Slack.ChannelName + `","link_names":"1"}`
@@ -48,10 +44,8 @@ func SendMessage(configData config.ConfigData, sendText string) {
 	defer response.Body.Close()
 }
 
-/**
- * Slackから送られたパラメータをパースする
- * @see https://qiita.com/holy_road_ss/items/51f988174be8d39e9c5f#golanglambdaslack%E9%83%A8%E5%88%86
- */
+// ParseSlackParams Slackから送られたパラメータをパースする
+// ParseSlackParams @see https://qiita.com/holy_road_ss/items/51f988174be8d39e9c5f#golanglambdaslack%E9%83%A8%E5%88%86
 func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 	result = &SlackParams{}
 

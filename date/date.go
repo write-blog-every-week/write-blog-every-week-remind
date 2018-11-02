@@ -4,17 +4,14 @@ import (
 	"time"
 )
 
-/**
- * 曜日の番号を返す
- * Goの場合
- * 0 => 日曜
- * 6 => 土曜
- *
- * になるので、Pythonにあわすため、以下にする
- * 0 => 月曜
- * 6 => 日曜
- */
+// GetWeekDayNumber 曜日の番号を返す
 func GetWeekDayNumber() int {
+	// Goの場合
+	// 0 => 日曜
+	// 6 => 土曜
+	// になるので、Pythonにあわすため、以下にする
+	// 0 => 月曜
+	// 6 => 日曜
 	weekday := int(time.Now().Weekday()) - 1
 	if weekday == -1 {
 		weekday = 6
@@ -23,9 +20,7 @@ func GetWeekDayNumber() int {
 	return weekday
 }
 
-/**
- * 今週の月曜の日付を取得する
- */
+// GetThisMonday 今週の月曜の日付を取得する
 func GetThisMonday(targetHour int) time.Time {
 	nowDate := getNowDate(targetHour)
 	weekday := GetWeekDayNumber()
@@ -33,10 +28,8 @@ func GetThisMonday(targetHour int) time.Time {
 	return nowDate.Add(time.Duration(-24*weekday) * time.Hour)
 }
 
-/**
- * 1週間前の月曜日を取得する
- * (ロジック的には月曜日固定ではないけど、lambdaが月曜日に実行されるからよしとする)
- */
+// GetLastWeekMonday 1週間前の月曜日を取得する
+// GetLastWeekMonday (ロジック的には月曜日固定ではないけど、lambdaが月曜日に実行されるからよしとする)
 func GetLastWeekMonday(targetHour int) time.Time {
 	nowDate := getNowDate(targetHour)
 	weekday := 7

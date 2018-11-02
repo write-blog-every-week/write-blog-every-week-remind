@@ -7,9 +7,7 @@ import (
 	gofeed "github.com/mmcdole/gofeed"
 )
 
-/**
- * ブログを書いていないユーザーを取得する
- */
+// FindTargetUserList ブログを書いていないユーザーを取得する
 func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) map[string]int {
 	// 日本時間に合わせる
 	locale, _ := time.LoadLocation("Asia/Tokyo")
@@ -36,9 +34,7 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 	return results
 }
 
-/**
- * 最新フィードの公開日を取得する
- */
+// getLatestFeedPubDate 最新フィードの公開日を取得する
 func getLatestFeedPubDate(feedURL string, requireCount int, parser *gofeed.Parser, locale *time.Location) time.Time {
 	// フィードを取得
 	feed, err := parser.ParseURL(feedURL)

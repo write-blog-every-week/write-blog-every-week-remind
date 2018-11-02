@@ -10,6 +10,7 @@ import (
 	slack "../slack"
 )
 
+// WriteBlogEveryWeek DynamoDBからのデータを格納する構造体
 type WriteBlogEveryWeek struct {
 	UserID       string `dynamo:"user_id"`
 	UserName     string `dynamo:"user_name"`
@@ -17,9 +18,7 @@ type WriteBlogEveryWeek struct {
 	RequireCount int    `dynamo:"require_count"`
 }
 
-/**
- * DynamoDBからデータを全取得する
- */
+// FindAll DynamoDBからデータを全取得する
 func FindAll(configData config.ConfigData) []WriteBlogEveryWeek {
 	var writeBlogEveryWeek []WriteBlogEveryWeek
 	table := getTableObject(configData)
@@ -31,9 +30,7 @@ func FindAll(configData config.ConfigData) []WriteBlogEveryWeek {
 	return writeBlogEveryWeek
 }
 
-/**
- * Pkを指定して1件取得
- */
+// FindByPK Pkを指定して1件取得
 func FindByPK(configData config.ConfigData, pk string) WriteBlogEveryWeek {
 	var writeBlogEveryWeek WriteBlogEveryWeek
 	table := getTableObject(configData)
@@ -41,9 +38,7 @@ func FindByPK(configData config.ConfigData, pk string) WriteBlogEveryWeek {
 	return writeBlogEveryWeek
 }
 
-/**
- * ブログの必要記事数を更新する
- */
+// UpdateRequireCount ブログの必要記事数を更新する
 func UpdateRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) {
 	table := getTableObject(configData)
 	for i := 0; i < len(allMemberDataList); i++ {
@@ -60,9 +55,7 @@ func UpdateRequireCount(configData config.ConfigData, allMemberDataList []WriteB
 	}
 }
 
-/**
- * ブログの必要記事数をリフレッシュする
- */
+// ResetRequireCount ブログの必要記事数をリフレッシュする
 func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) map[string]int {
 	table := getTableObject(configData)
 	results := map[string]int{}
@@ -81,9 +74,7 @@ func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBl
 	return results
 }
 
-/**
- * 新しいユーザーデータを作成する
- */
+// CreateUser 新しいユーザーデータを作成する
 func CreateUser(configData config.ConfigData, slackParams *slack.SlackParams) {
 	var writeBlogEveryWeek WriteBlogEveryWeek
 	writeBlogEveryWeek.UserID = slackParams.UserID
