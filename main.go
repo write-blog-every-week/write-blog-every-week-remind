@@ -13,9 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-/**
- * Main.
- */
+// main
 func main() {
 	executeFunction := os.Getenv("GOLANG_EXECUTE_FUNCTION")
 	if executeFunction == "reminder" {
@@ -31,9 +29,7 @@ func main() {
 	}
 }
 
-/**
- * ブログのリマインダーロジックを実行
- */
+// blogReminder ブログのリマインダーロジックを実行
 func blogReminder() {
 	const targetHour int = 15
 	thisMonday := date.GetThisMonday(targetHour)
@@ -41,14 +37,11 @@ func blogReminder() {
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
 	sendText := message.MakeReminderSendText(targetUserList)
-	database.UpdateRequireCount(configData, allMemberDataList, targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
 
-/**
- * ブログの登録ロジックを実行
- */
+// blogRegister ブログの登録ロジックを実行
 func blogRegister(_ context.Context, rawParams interface{}) (interface{}, error) {
 	configData := config.GetConfigData()
 	envToken := os.Getenv("SLACK_TOKEN")
@@ -68,9 +61,7 @@ func blogRegister(_ context.Context, rawParams interface{}) (interface{}, error)
 	return "ブログを登録しました。これからは妥協は許しませんよ。", nil
 }
 
-/**
- * ブログ書けたかどうか通知のロジックを実行
- */
+// blogResult ブログ書けたかどうか通知のロジックを実行
 func blogResult() {
 	const targetHour int = 0
 	lastWeekMonday := date.GetLastWeekMonday(targetHour)

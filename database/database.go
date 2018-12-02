@@ -38,23 +38,6 @@ func FindByPK(configData config.ConfigData, pk string) WriteBlogEveryWeek {
 	return writeBlogEveryWeek
 }
 
-// UpdateRequireCount ブログの必要記事数を更新する
-func UpdateRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) {
-	table := getTableObject(configData)
-	for i := 0; i < len(allMemberDataList); i++ {
-		findRequireCount := allMemberDataList[i].RequireCount
-		currentRequireCount := targetUserList[allMemberDataList[i].UserID]
-		if findRequireCount != currentRequireCount {
-			// 食い違っている = 少なくとも1記事以上は書いているはず
-			allMemberDataList[i].RequireCount = currentRequireCount
-			err := table.Put(allMemberDataList[i]).Run()
-			if err != nil {
-				panic("データ保存エラー => " + err.Error())
-			}
-		}
-	}
-}
-
 // ResetRequireCount ブログの必要記事数をリフレッシュする
 func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) map[string]int {
 	table := getTableObject(configData)
