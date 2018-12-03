@@ -12,7 +12,6 @@ type ConfigData struct {
 type Slack struct {
 	SendAPIURL    string
 	ChannelName   string
-	RegsiterToken string
 }
 
 // AWS AWS用設定データ格納構造体
