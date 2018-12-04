@@ -10,8 +10,8 @@ type ConfigData struct {
 
 // Slack Slack用設定データ格納構造体
 type Slack struct {
-	SendAPIURL    string
-	ChannelName   string
+	SendAPIURL  string
+	ChannelName string
 }
 
 // AWS AWS用設定データ格納構造体

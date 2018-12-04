@@ -13,7 +13,7 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 	locale, _ := time.LoadLocation("Asia/Tokyo")
 	parser := gofeed.NewParser()
 
-	results := map[string]int{}
+	results := make(map[string]int)
 	for i := 0; i < len(allMemberDataList); i++ {
 		for j := 0; j < allMemberDataList[i].RequireCount; j++ {
 			// 最新フィードの公開日を取得する
