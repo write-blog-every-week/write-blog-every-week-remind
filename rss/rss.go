@@ -14,19 +14,19 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 	parser := gofeed.NewParser()
 
 	results := make(map[string]int)
-	for i := 0; i < len(allMemberDataList); i++ {
-		for j := 0; j < allMemberDataList[i].RequireCount; j++ {
+	for _, wbem := range allMemberDataList {
+		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
-			latestPublishDate := getLatestFeedPubDate(allMemberDataList[i].FeedURL, j, parser, locale)
+			latestPublishDate := getLatestFeedPubDate(wbem.FeedURL, i, parser, locale)
 
 			// 今週の月曜日がAfterになる = 今週ブログを書いていない
 			if targetMonday.After(latestPublishDate) {
-				if _, ok := results[allMemberDataList[i].UserID]; !ok {
+				if _, ok := results[wbem.UserID]; !ok {
 					// データがない場合は初期化
-					results[allMemberDataList[i].UserID] = 0
+					results[wbem.UserID] = 0
 				}
 
-				results[allMemberDataList[i].UserID]++
+				results[wbem.UserID]++
 			}
 		}
 	}
