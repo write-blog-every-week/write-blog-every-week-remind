@@ -59,14 +59,14 @@ func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBl
 
 // CreateUser 新しいユーザーデータを作成する
 func CreateUser(configData config.ConfigData, slackParams *slack.SlackParams) {
-	var writeBlogEveryWeek WriteBlogEveryWeek
-	writeBlogEveryWeek.UserID = slackParams.UserID
-	writeBlogEveryWeek.UserName = slackParams.UserName
-	writeBlogEveryWeek.FeedURL = slackParams.Text
-	writeBlogEveryWeek.RequireCount = 1
+	writeBlogEveryWeek := WriteBlogEveryWeek{
+		UserID:       slackParams.UserID,
+		UserName:     slackParams.UserName,
+		FeedURL:      slackParams.Text,
+		RequireCount: 1,
+	}
 	table := getTableObject(configData)
-	err := table.Put(writeBlogEveryWeek).Run()
-	if err != nil {
+	if err := table.Put(writeBlogEveryWeek).Run(); err != nil {
 		panic("登録エラー => " + err.Error())
 	}
 }
