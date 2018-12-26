@@ -4,6 +4,7 @@ import (
 	time "time"
 
 	database "../database"
+	date "../date"
 	gofeed "github.com/mmcdole/gofeed"
 )
 
@@ -40,6 +41,11 @@ func getLatestFeedPubDate(feedURL string, requireCount int, parser *gofeed.Parse
 	feed, err := parser.ParseURL(feedURL)
 	if err != nil {
 		panic("フィードが取得できませんでした。失敗したフィードURL => " + feedURL)
+	}
+
+	if (requireCount + 1) > len(feed.Items) {
+		// そもそも記事数が足りない場合は公開日を取得できないのでlatestは、必ず通知対象となる2週間以上前のものにセットする
+		return date.Get2WeekAgoDate()
 	}
 
 	// 最新日を取得

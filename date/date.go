@@ -37,6 +37,14 @@ func GetLastWeekMonday(targetHour int) time.Time {
 	return nowDate.Add(time.Duration(-24*weekday) * time.Hour)
 }
 
+// Get2WeekAgoDate 2週間前以上の日付を取得する
+func Get2WeekAgoDate() time.Time {
+	nowDate := getNowDate(0)
+	weekday := 14
+	nowDate = time.Date(nowDate.Year(), nowDate.Month(), nowDate.Day(), 00, 00, 00, 0, time.Local)
+	return nowDate.Add(time.Duration(-24*weekday) * time.Hour)
+}
+
 /**
  * 現在の日付を取得する
  */
