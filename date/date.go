@@ -41,11 +41,6 @@ func SetFakeTime(t time.Time) {
 	fakeTime = t
 }
 
-// ResetFake stubとして設定した日付データをリセットする
-func ResetFake() {
-	fakeTime = time.Time{}
-}
-
 // TimeNow 現在の日付を返す(stub用のデータが有る場合はstubデータを返す)
 func TimeNow() time.Time {
 	if !fakeTime.IsZero() {
