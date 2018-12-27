@@ -35,7 +35,15 @@ func blogReminder() {
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
-	sendText := message.MakeReminderSendText(targetUserList)
+
+	userList := map[string]int{}
+	for userID, requireCount := range targetUserList {
+		if requireCount >= 1 {
+			userList[userID] = requireCount
+		}
+	}
+
+	sendText := message.MakeReminderSendText(userList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
