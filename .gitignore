@@ -22,3 +22,6 @@
 *.toml
 *.zip
 # End of https://www.gitignore.io/api/go
+
+# Built binary
+write-blog-every-week-remind
