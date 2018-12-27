@@ -4,7 +4,7 @@ import (
 	time "time"
 
 	database "../database"
-	date "../date"
+	"../date"
 	gofeed "github.com/mmcdole/gofeed"
 )
 
@@ -16,17 +16,23 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 
 	results := make(map[string]int)
 	for _, wbem := range allMemberDataList {
+		// フィードを取得
+		feed, err := parser.ParseURL(wbem.FeedURL)
+		if err != nil {
+			panic("フィードが取得できませんでした。失敗したフィードURL => " + wbem.FeedURL)
+		}
+
+		if _, ok := results[wbem.UserID]; !ok {
+			// データがない場合は初期化
+			results[wbem.UserID] = 0
+		}
+
 		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
-			latestPublishDate := getLatestFeedPubDate(wbem.FeedURL, i, parser, locale)
+			latestPublishDate := getLatestFeedPubDate(feed, i, parser, locale)
 
 			// 今週の月曜日がAfterになる = 今週ブログを書いていない
 			if targetMonday.After(latestPublishDate) {
-				if _, ok := results[wbem.UserID]; !ok {
-					// データがない場合は初期化
-					results[wbem.UserID] = 0
-				}
-
 				results[wbem.UserID]++
 			}
 		}
@@ -36,16 +42,10 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 }
 
 // getLatestFeedPubDate 最新フィードの公開日を取得する
-func getLatestFeedPubDate(feedURL string, requireCount int, parser *gofeed.Parser, locale *time.Location) time.Time {
-	// フィードを取得
-	feed, err := parser.ParseURL(feedURL)
-	if err != nil {
-		panic("フィードが取得できませんでした。失敗したフィードURL => " + feedURL)
-	}
-
+func getLatestFeedPubDate(feed *gofeed.Feed, requireCount int, parser *gofeed.Parser, locale *time.Location) time.Time {
 	if (requireCount + 1) > len(feed.Items) {
-		// そもそも記事数が足りない場合は公開日を取得できないのでlatestは、必ず通知対象となる2週間以上前のものにセットする
-		return date.Get2WeekAgoDate()
+		// そもそも記事数が足りない場合は公開日を取得できないのでlatestは、必ず通知対象となる今週の月曜日と合わせる
+		return date.GetThisMonday()
 	}
 
 	// 最新日を取得

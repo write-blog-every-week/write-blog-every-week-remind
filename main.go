@@ -31,8 +31,7 @@ func main() {
 
 // blogReminder ブログのリマインダーロジックを実行
 func blogReminder() {
-	const targetHour int = 15
-	thisMonday := date.GetThisMonday(targetHour)
+	thisMonday := date.GetThisMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
@@ -63,13 +62,19 @@ func blogRegister(_ context.Context, rawParams interface{}) (interface{}, error)
 
 // blogResult ブログ書けたかどうか通知のロジックを実行
 func blogResult() {
-	const targetHour int = 0
-	lastWeekMonday := date.GetLastWeekMonday(targetHour)
+	lastWeekMonday := date.GetLastWeekMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
-	targetUserList = database.ResetRequireCount(configData, allMemberDataList, targetUserList)
-	sendText := message.MakeResultSendText(targetUserList)
+
+	userList := map[string]int{}
+	for userID, requireCount := range targetUserList {
+		// 0の人は1になり、1以上の人は1記事増える
+		userList[userID] = requireCount + 1
+	}
+
+	database.ResetRequireCount(configData, userList)
+	sendText := message.MakeResultSendText(userList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
