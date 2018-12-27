@@ -9,6 +9,13 @@ import (
 
 // MakeReminderSendText Slackへリマインダーを送信する用のメッセージを作成する
 func MakeReminderSendText(targetUserList map[string]int) string {
+	if len(targetUserList) == 0 {
+		return `
+<!channel>
+今週は全員がブログを書きました！ :tada:
+やったね！！！
+`
+	}
 	return fmt.Sprintf(`
 <!channel>
 まだブログを書けていないユーザーがいます！
