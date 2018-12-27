@@ -31,8 +31,8 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 			// 最新フィードの公開日を取得する
 			latestPublishDate := getLatestFeedPubDate(feed, i, parser, locale)
 
-			// 今週の月曜日がAfterになる = 今週ブログを書いていない
-			if targetMonday.After(latestPublishDate) {
+			// 今週の月曜日が過去ではない場合は、まだ今週ブログを書いていない
+			if !targetMonday.Before(latestPublishDate) {
 				results[wbem.UserID]++
 			}
 		}
