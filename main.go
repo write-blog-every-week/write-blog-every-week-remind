@@ -36,14 +36,13 @@ func blogReminder() {
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
 
-	userList := map[string]int{}
-	for userID, requireCount := range targetUserList {
-		if requireCount >= 1 {
-			userList[userID] = requireCount
+	for u, c := range targetUserList {
+		if c == 0 {
+			delete(targetUserList, u)
 		}
 	}
 
-	sendText := message.MakeReminderSendText(userList)
+	sendText := message.MakeReminderSendText(targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
@@ -75,14 +74,13 @@ func blogResult() {
 	allMemberDataList := database.FindAll(configData)
 	targetUserList := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
 
-	userList := map[string]int{}
-	for userID, requireCount := range targetUserList {
+	for userID := range targetUserList {
 		// 0の人は1になり、1以上の人は1記事増える
-		userList[userID] = requireCount + 1
+		targetUserList[userID]++
 	}
 
-	database.ResetRequireCount(configData, userList)
-	sendText := message.MakeResultSendText(userList)
+	database.ResetRequireCount(configData, targetUserList)
+	sendText := message.MakeResultSendText(targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
