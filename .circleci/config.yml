@@ -20,15 +20,7 @@ jobs:
       - checkout
       - run:
           name: Get dependency packages
-          command: |
-            go get github.com/pierrre/gotestcover
-            go get github.com/aws/aws-lambda-go/lambda
-            go get github.com/mmcdole/gofeed
-            go get github.com/aws/aws-sdk-go/aws
-            go get github.com/aws/aws-sdk-go/aws/credentials
-            go get github.com/aws/aws-sdk-go/aws/session
-            go get github.com/guregu/dynamo
-            go get github.com/BurntSushi/toml
+          command: go get ./...
       - persist_to_workspace:
           root: /go/
           paths:
@@ -54,9 +46,9 @@ workflows:
           filters:
             branches:
               <<: *branches
-#     - test:
-#         requires:
-#           - build
-#         filters:
-#           branches:
-#             <<: *branches
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              <<: *branches

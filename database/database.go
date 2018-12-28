@@ -5,9 +5,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/guregu/dynamo"
-
-	config "../config"
-	slack "../slack"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/config"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/slack"
 )
 
 // WriteBlogEveryWeek DynamoDBからのデータを格納する構造体

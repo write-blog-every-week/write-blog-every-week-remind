@@ -4,13 +4,13 @@ import (
 	"context"
 	"os"
 
-	"./config"
-	"./database"
-	"./date"
-	"./message"
-	"./rss"
-	"./slack"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/config"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/database"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/message"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/rss"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/slack"
 )
 
 // main
