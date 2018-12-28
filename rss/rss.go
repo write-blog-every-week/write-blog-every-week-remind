@@ -22,6 +22,9 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 			panic("フィードが取得できませんでした。失敗したフィードURL => " + wbem.FeedURL)
 		}
 
+		// 全ユーザーの情報を入れるため初期化
+		results[wbem.UserID] = 0
+
 		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
 			latestPublishDate := getLatestFeedPubDate(feed, i, parser, locale)
