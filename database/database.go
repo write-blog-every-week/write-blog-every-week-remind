@@ -39,22 +39,14 @@ func FindByPK(configData config.ConfigData, pk string) WriteBlogEveryWeek {
 }
 
 // ResetRequireCount ブログの必要記事数をリフレッシュする
-func ResetRequireCount(configData config.ConfigData, allMemberDataList []WriteBlogEveryWeek, targetUserList map[string]int) map[string]int {
+func ResetRequireCount(configData config.ConfigData, userList map[string]int) {
 	table := getTableObject(configData)
-	results := map[string]int{}
-	for i := 0; i < len(allMemberDataList); i++ {
-		// 0の人は1になり、1以上の人は1記事増える
-		targetUserList[allMemberDataList[i].UserID]++
-		allMemberDataList[i].RequireCount = targetUserList[allMemberDataList[i].UserID]
-		err := table.Put(allMemberDataList[i]).Run()
+	for userID, requireCount := range userList {
+		err := table.Update("user_id", userID).Set("require_count", requireCount).Run()
 		if err != nil {
 			panic("データ保存エラー => " + err.Error())
 		}
-
-		results[allMemberDataList[i].UserID] = allMemberDataList[i].RequireCount
 	}
-
-	return results
 }
 
 // CreateUser 新しいユーザーデータを作成する

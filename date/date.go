@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+var fakeTime time.Time
+
 // GetWeekDayNumber 曜日の番号を返す
 func GetWeekDayNumber() int {
 	// Goの場合
@@ -12,7 +14,7 @@ func GetWeekDayNumber() int {
 	// になるので、Pythonにあわすため、以下にする
 	// 0 => 月曜
 	// 6 => 日曜
-	weekday := int(time.Now().Weekday()) - 1
+	weekday := int(TimeNow().Weekday()) - 1
 	if weekday == -1 {
 		weekday = 6
 	}
@@ -21,26 +23,36 @@ func GetWeekDayNumber() int {
 }
 
 // GetThisMonday 今週の月曜の日付を取得する
-func GetThisMonday(targetHour int) time.Time {
-	nowDate := getNowDate(targetHour)
+func GetThisMonday() time.Time {
+	nowDate := getNowDate()
 	weekday := GetWeekDayNumber()
-	nowDate = time.Date(nowDate.Year(), nowDate.Month(), nowDate.Day(), 00, 00, 00, 0, time.Local)
-	return nowDate.Add(time.Duration(-24*weekday) * time.Hour)
+	return nowDate.AddDate(0, 0, -weekday)
 }
 
-// GetLastWeekMonday 1週間前の月曜日を取得する
-// GetLastWeekMonday (ロジック的には月曜日固定ではないけど、lambdaが月曜日に実行されるからよしとする)
-func GetLastWeekMonday(targetHour int) time.Time {
-	nowDate := getNowDate(targetHour)
+// GetLastWeekMonday 1週間前の月曜日を取得する(ロジック的には月曜日固定ではないけど、lambdaが月曜日に実行されるからよしとする)
+func GetLastWeekMonday() time.Time {
+	nowDate := getNowDate()
 	weekday := 7
-	nowDate = time.Date(nowDate.Year(), nowDate.Month(), nowDate.Day(), 00, 00, 00, 0, time.Local)
-	return nowDate.Add(time.Duration(-24*weekday) * time.Hour)
+	return nowDate.AddDate(0, 0, -weekday)
+}
+
+// SetFakeTime stub用の日付データをセットする
+func SetFakeTime(t time.Time) {
+	fakeTime = t
+}
+
+// TimeNow 現在の日付を返す(stub用のデータが有る場合はstubデータを返す)
+func TimeNow() time.Time {
+	if !fakeTime.IsZero() {
+		return fakeTime
+	}
+	return time.Now()
 }
 
 /**
  * 現在の日付を取得する
  */
-func getNowDate(targetHour int) time.Time {
-	t := time.Now()
-	return time.Date(t.Year(), t.Month(), t.Day(), targetHour, 00, 00, 0, time.Local)
+func getNowDate() time.Time {
+	t := TimeNow()
+	return time.Date(t.Year(), t.Month(), t.Day(), 00, 00, 00, 0, time.Local)
 }
