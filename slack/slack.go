@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	config "../config"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/config"
 )
 
 // SlackParams Slackからのリクエストを格納する構造体

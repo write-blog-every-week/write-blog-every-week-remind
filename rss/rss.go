@@ -1,11 +1,11 @@
 package rss
 
 import (
-	time "time"
+	"time"
 
-	database "../database"
-	"../date"
-	gofeed "github.com/mmcdole/gofeed"
+	"github.com/mmcdole/gofeed"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/database"
+	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
 )
 
 // FindTargetUserList ブログを書いていないユーザーを取得する
