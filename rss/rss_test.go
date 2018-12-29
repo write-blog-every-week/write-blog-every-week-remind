@@ -50,7 +50,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getLatestFeedPubDate(tt.feed, tt.requireCount, nil, time.Local); got != tt.want {
+			if got := getLatestFeedPubDate(tt.feed, tt.requireCount, time.Local); got != tt.want {
 				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
 			}
 		})

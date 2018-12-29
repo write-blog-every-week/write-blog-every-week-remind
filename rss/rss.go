@@ -27,7 +27,7 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 
 		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
-			latestPublishDate := getLatestFeedPubDate(feed, i, parser, locale)
+			latestPublishDate := getLatestFeedPubDate(feed, i, locale)
 
 			// 今週の月曜日が過去ではない場合は、まだ今週ブログを書いていない
 			if !targetMonday.Before(latestPublishDate) {
@@ -40,7 +40,7 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 }
 
 // getLatestFeedPubDate 最新フィードの公開日を取得する
-func getLatestFeedPubDate(feed *gofeed.Feed, requireCount int, parser *gofeed.Parser, locale *time.Location) time.Time {
+func getLatestFeedPubDate(feed *gofeed.Feed, requireCount int, locale *time.Location) time.Time {
 	if (requireCount + 1) > len(feed.Items) {
 		// そもそも記事数が足りない場合は公開日を取得できないのでlatestは、必ず通知対象となる今週の月曜日と合わせる
 		return date.GetThisMonday()
