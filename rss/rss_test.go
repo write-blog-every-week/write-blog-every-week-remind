@@ -38,7 +38,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 			want: thisMonday,
 		},
 		{
-			name: "1 feed this week",
+			name: "1 feed required and written",
 			feed: &gofeed.Feed{
 				Items: []*gofeed.Item{
 					item("Wed, 26 Dec 2018 19:00:00 +0900"),
@@ -46,6 +46,48 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 			},
 			requireCount: 0,
 			want: parse("Wed, 26 Dec 2018 19:00:00 +0900"),
+		},
+		{
+			name: "1 feed required and not written",
+			feed: &gofeed.Feed{
+				Items: []*gofeed.Item{
+					item("Wed, 19 Dec 2018 19:00:00 +0900"),
+				},
+			},
+			requireCount: 0,
+			want: parse("Wed, 19 Dec 2018 19:00:00 +0900"),
+		},
+		{
+			name: "2 feeds required and only 1 feed exists",
+			feed: &gofeed.Feed{
+				Items: []*gofeed.Item{
+					item("Wed, 26 Dec 2018 19:00:00 +0900"),
+				},
+			},
+			requireCount: 1,
+			want: thisMonday,
+		},
+		{
+			name: "2 feeds required and only 1 feed written this week",
+			feed: &gofeed.Feed{
+				Items: []*gofeed.Item{
+					item("Wed, 26 Dec 2018 19:00:00 +0900"),
+					item("Tue, 18 Dec 2018 19:00:00 +0900"),
+				},
+			},
+			requireCount: 1,
+			want: parse("Tue, 18 Dec 2018 19:00:00 +0900"),
+		},
+		{
+			name: "2 feeds required and written",
+			feed: &gofeed.Feed{
+				Items: []*gofeed.Item{
+					item("Wed, 26 Dec 2018 19:00:00 +0900"),
+					item("Tue, 25 Dec 2018 19:00:00 +0900"),
+				},
+			},
+			requireCount: 1,
+			want: parse("Tue, 25 Dec 2018 19:00:00 +0900"),
 		},
 	}
 	for _, tt := range tests {
