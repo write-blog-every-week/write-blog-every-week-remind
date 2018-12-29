@@ -8,11 +8,27 @@ import (
 	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
 )
 
+type Parser interface {
+	ParseURL(url string) (feed *gofeed.Feed, err error)
+}
+
+type rssParser struct {
+	parser	*gofeed.Parser
+}
+
+func (rp *rssParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
+	return rp.parser.ParseURL(url)
+}
+
 // FindTargetUserList ブログを書いていないユーザーを取得する
 func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) map[string]int {
+	rssParser := &rssParser{gofeed.NewParser()}
+	return findTargetUserList(allMemberDataList, targetMonday, rssParser)
+}
+
+func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) map[string]int {
 	// 日本時間に合わせる
 	locale, _ := time.LoadLocation("Asia/Tokyo")
-	parser := gofeed.NewParser()
 
 	results := make(map[string]int)
 	for _, wbem := range allMemberDataList {
