@@ -1,6 +1,7 @@
 package rss
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -40,18 +41,19 @@ func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 
 		// 全ユーザーの情報を入れるため初期化
 		results[wbem.UserID] = 0
-
+		fmt.Println(wbem.UserID)
 		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
 			latestPublishDate := getLatestFeedPubDate(feed, i, locale)
-
+			fmt.Println(latestPublishDate)
+			fmt.Println(!targetMonday.Before(latestPublishDate))
 			// 今週の月曜日が過去ではない場合は、まだ今週ブログを書いていない
 			if !targetMonday.Before(latestPublishDate) {
 				results[wbem.UserID]++
 			}
 		}
 	}
-
+	fmt.Println(results)
 	return results
 }
 
