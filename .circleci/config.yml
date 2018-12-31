@@ -10,7 +10,7 @@ branches: &branches
   only:
     - master
     - circleci
-    - /pull.*/
+    - /pull/.*
 
 version: 2
 jobs:
