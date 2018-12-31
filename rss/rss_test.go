@@ -9,9 +9,11 @@ import (
 	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
 )
 
+var asiaTokyo, _ = time.LoadLocation("Asia/Tokyo")
+
 func parse(published string) time.Time {
 	// なぜかRFC3339でうまくパースできないのでRFC1123Z
-	parsed, _ := time.ParseInLocation(time.RFC1123Z, published, time.Local)
+	parsed, _ := time.ParseInLocation(time.RFC1123Z, published, asiaTokyo)
 	return parsed
 }
 
@@ -24,7 +26,7 @@ func item(published string) *gofeed.Item {
 }
 
 func TestGetLatestFeedPubDate(t *testing.T) {
-	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, time.Local))
+	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, asiaTokyo))
 	thisMonday := date.GetThisMonday()
 	tests := []struct {
 		name		 string
@@ -93,7 +95,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getLatestFeedPubDate(tt.feed, tt.requireCount, time.Local); !got.Equal(tt.want) {
+			if got := getLatestFeedPubDate(tt.feed, tt.requireCount, asiaTokyo); !got.Equal(tt.want) {
 				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
 			}
 		})
@@ -125,7 +127,7 @@ func (mp *mockParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
 }
 
 func TestFindTargetUserList(t *testing.T) {
-	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, time.Local))
+	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, asiaTokyo))
 	thisMonday := parse("Mon, 24 Dec 2018 00:00:00 +0900")
 	tests := []struct {
 		name	string
