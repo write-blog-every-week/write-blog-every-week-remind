@@ -8,6 +8,8 @@ import (
 	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
 )
 
+var asiaTokyo, _ = time.LoadLocation("Asia/Tokyo")
+
 type Parser interface {
 	ParseURL(url string) (feed *gofeed.Feed, err error)
 }
@@ -27,9 +29,6 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 }
 
 func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) map[string]int {
-	// 日本時間に合わせる
-	locale, _ := time.LoadLocation("Asia/Tokyo")
-
 	results := make(map[string]int)
 	for _, wbem := range allMemberDataList {
 		// フィードを取得
@@ -43,7 +42,7 @@ func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 
 		for i := 0; i < wbem.RequireCount; i++ {
 			// 最新フィードの公開日を取得する
-			latestPublishDate := getLatestFeedPubDate(feed, i, locale)
+			latestPublishDate := getLatestFeedPubDate(feed, i, asiaTokyo)
 
 			// 今週の月曜日が過去ではない場合は、まだ今週ブログを書いていない
 			if !targetMonday.Before(latestPublishDate) {

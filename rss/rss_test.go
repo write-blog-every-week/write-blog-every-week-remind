@@ -9,8 +9,6 @@ import (
 	"github.com/write-blog-every-week/write-blog-every-week-remind/date"
 )
 
-var asiaTokyo, _ = time.LoadLocation("Asia/Tokyo")
-
 func parse(published string) time.Time {
 	// なぜかRFC3339でうまくパースできないのでRFC1123Z
 	parsed, _ := time.ParseInLocation(time.RFC1123Z, published, asiaTokyo)

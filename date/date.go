@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+var asiaTokyo, _ = time.LoadLocation("Asia/Tokyo")
 var fakeTime time.Time
 
 // GetWeekDayNumber 曜日の番号を返す
@@ -54,5 +55,5 @@ func TimeNow() time.Time {
  */
 func getNowDate() time.Time {
 	t := TimeNow()
-	return time.Date(t.Year(), t.Month(), t.Day(), 00, 00, 00, 0, time.Local)
+	return time.Date(t.Year(), t.Month(), t.Day(), 00, 00, 00, 0, asiaTokyo)
 }
