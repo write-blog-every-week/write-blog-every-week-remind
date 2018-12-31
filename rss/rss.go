@@ -30,7 +30,7 @@ func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) map[string]int {
 	// 日本時間に合わせる
 	locale, _ := time.LoadLocation("Asia/Tokyo")
-
+	fmt.Println(locale)
 	results := make(map[string]int)
 	for _, wbem := range allMemberDataList {
 		// フィードを取得
