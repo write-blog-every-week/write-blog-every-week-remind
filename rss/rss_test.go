@@ -128,7 +128,7 @@ func (mp *mockParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
 
 func TestFindTargetUserList(t *testing.T) {
 	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, asiaTokyo))
-	thisMonday := parse("Mon, 24 Dec 2018 00:00:00 +0900")
+	thisMonday := time.Date(2018, 12, 24, 0, 0, 0, 0, asiaTokyo)
 	tests := []struct {
 		name	string
 		members	[]database.WriteBlogEveryWeek
