@@ -6,12 +6,6 @@ defaults: &defaults
     - GOPATH: /go
     - SRC_PATH: /go/src/github.com/write-blog-every-week/write-blog-every-week-remind
 
-branches: &branches
-  only:
-    - master
-    - circleci
-    - /pull.*/
-
 version: 2
 jobs:
   build:
@@ -42,13 +36,7 @@ workflows:
   version: 2
   build_test:
     jobs:
-      - build:
-          filters:
-            branches:
-              <<: *branches
+      - build
       - test:
           requires:
             - build
-          filters:
-            branches:
-              <<: *branches
