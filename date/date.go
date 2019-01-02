@@ -30,10 +30,10 @@ func GetThisMonday() time.Time {
 	return nowDate.AddDate(0, 0, -weekday)
 }
 
-// GetLastWeekMonday 1週間前の月曜日を取得する(ロジック的には月曜日固定ではないけど、lambdaが月曜日に実行されるからよしとする)
+// GetLastWeekMonday 1週間前の月曜日を取得する
 func GetLastWeekMonday() time.Time {
 	nowDate := getNowDate()
-	weekday := 7
+	weekday := 7 + GetWeekDayNumber()
 	return nowDate.AddDate(0, 0, -weekday)
 }
 
