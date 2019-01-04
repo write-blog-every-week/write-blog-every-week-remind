@@ -35,6 +35,38 @@ func TestMakeReminderSendText(t *testing.T) {
 <@fuga>さん    残り1記事
 `,
 		},
+		{
+			name: "tenUsers",
+			list: map[string]int{
+				"user1": 1,
+				"user2": 2,
+				"user3": 3,
+				"user4": 4,
+				"user5": 5,
+				"user6": 6,
+				"user7": 7,
+				"user8": 8,
+				"user9": 9,
+				"user10": 10,
+			},
+			want: `
+<!channel>
+まだブログを書けていないユーザーがいます！
+今週中に書けるようみんなで煽りましょう！
+書けていないユーザー: 10人
+================
+<@user1>さん     残り1記事
+<@user10>さん    残り10記事
+<@user2>さん     残り2記事
+<@user3>さん     残り3記事
+<@user4>さん     残り4記事
+<@user5>さん     残り5記事
+<@user6>さん     残り6記事
+<@user7>さん     残り7記事
+<@user8>さん     残り8記事
+<@user9>さん     残り9記事
+`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
