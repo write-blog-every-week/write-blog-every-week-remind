@@ -9,7 +9,8 @@ import (
 
 // MakeReminderSendText Slackへリマインダーを送信する用のメッセージを作成する
 func MakeReminderSendText(targetUserList map[string]int) string {
-	if len(targetUserList) == 0 {
+	count := len(targetUserList)
+	if count == 0 {
 		return `
 <!channel>
 今週は全員がブログを書きました！ :tada:
@@ -20,9 +21,9 @@ func MakeReminderSendText(targetUserList map[string]int) string {
 <!channel>
 まだブログを書けていないユーザーがいます！
 今週中に書けるようみんなで煽りましょう！
-書けていないユーザー
+書けていないユーザー: %d人
 ================
-%s`, getReminderReplaceMessageList(targetUserList))
+%s`, count, getReminderReplaceMessageList(targetUserList))
 }
 
 // MakeResultSendText Slackへ先週の結果を送信するようのメッセージを作成する
