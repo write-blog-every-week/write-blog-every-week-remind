@@ -45,6 +45,38 @@ func TestMakeReminderSendText(t *testing.T) {
 	}
 }
 
+func TestMakeResultSendText(t *testing.T) {
+	tests := []struct {
+		name string
+		list map[string]int
+		want string
+	}{
+		{
+			name: "normalTest",
+			list: map[string]int{
+				"user1": 2,
+				"user2": 1,
+			},
+			want: `
+<!channel>
+1週間お疲れ様でした！
+今週も頑張ってブログを書きましょう！
+先週ブログを書けていない人は今週書くブログ記事が増えていることを確認してください！
+================
+<@user1>さん    残り2記事
+<@user2>さん    残り1記事
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MakeResultSendText(tt.list); got != tt.want {
+				t.Errorf("want \n%s\n, but got\n%s\n", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestGetRminderReplaceMessageList(t *testing.T) {
 	tests := []struct {
 		name      string
