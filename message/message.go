@@ -26,14 +26,44 @@ func MakeReminderSendText(targetUserList map[string]int) string {
 }
 
 // MakeResultSendText Slackへ先週の結果を送信するようのメッセージを作成する
-func MakeResultSendText(targetUserList map[string]int) string {
+func MakeResultSendText(maxBlogQuota int, targetUserList map[string]int) string {
 	return fmt.Sprintf(`
 <!channel>
 1週間お疲れ様でした！
 今週も頑張ってブログを書きましょう！
 先週ブログを書けていない人は今週書くブログ記事が増えていることを確認してください！
 ================
-%s`, getReminderReplaceMessageList(targetUserList))
+%s================
+
+%s
+`,
+		getReminderReplaceMessageListLessThanOrEqualToQuota(maxBlogQuota, targetUserList),
+		getReminderReplaceMessageListGreaterThanQuota(maxBlogQuota, targetUserList))
+}
+
+func getReminderReplaceMessageListLessThanOrEqualToQuota(maxBlogQuota int, targetUserList map[string]int) string {
+	filteredUserList := make(map[string]int, len(targetUserList))
+	for k, v := range targetUserList {
+		if v <= maxBlogQuota {
+			filteredUserList[k] = v
+		}
+	}
+	return getReminderReplaceMessageList(filteredUserList)
+}
+
+func getReminderReplaceMessageListGreaterThanQuota(maxBlogQuota int, targetUserList map[string]int) string {
+	filteredUserList := make(map[string]int, len(targetUserList))
+	for k, v := range targetUserList {
+		if v > maxBlogQuota {
+			filteredUserList[k] = v
+		}
+	}
+	if len(filteredUserList) == 0 {
+		return "今週は退会対象者はいません！ :tada:"
+	}
+	return fmt.Sprintf(`残念ながら以下の方は退会となります :cry:
+================
+%s================`, getReminderReplaceMessageList(filteredUserList))
 }
 
 // getReminderReplaceMessageList リマインダー用のユーザーリスト文字列を取得する

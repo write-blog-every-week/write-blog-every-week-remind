@@ -80,7 +80,7 @@ func blogResult() {
 	}
 
 	database.ResetRequireCount(configData, targetUserList)
-	sendText := message.MakeResultSendText(targetUserList)
+	sendText := message.MakeResultSendText(configData.Blog.MaxBlogQuota, targetUserList)
 	slack.SendMessage(configData, sendText)
 	// fmt.Println(sendText)
 }
