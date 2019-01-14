@@ -37,27 +37,26 @@ func MakeResultSendText(maxBlogQuota int, targetUserList map[string]int) string 
 
 %s
 `,
-		getReminderReplaceMessageListLessThanOrEqualToQuota(maxBlogQuota, targetUserList),
-		getReminderReplaceMessageListGreaterThanQuota(maxBlogQuota, targetUserList))
+		getReminderReplaceMessageList(filter(targetUserList, func(count int) bool {
+			return count <= maxBlogQuota
+		})),
+		getCancelReplaceMessageList(filter(targetUserList, func(count int) bool {
+			return count > maxBlogQuota
+		})))
 }
 
-func getReminderReplaceMessageListLessThanOrEqualToQuota(maxBlogQuota int, targetUserList map[string]int) string {
+func filter(targetUserList map[string]int, judge func(int) bool) map[string]int {
 	filteredUserList := make(map[string]int, len(targetUserList))
 	for k, v := range targetUserList {
-		if v <= maxBlogQuota {
+		if judge(v) {
 			filteredUserList[k] = v
 		}
 	}
-	return getReminderReplaceMessageList(filteredUserList)
+	return filteredUserList
 }
 
-func getReminderReplaceMessageListGreaterThanQuota(maxBlogQuota int, targetUserList map[string]int) string {
-	filteredUserList := make(map[string]int, len(targetUserList))
-	for k, v := range targetUserList {
-		if v > maxBlogQuota {
-			filteredUserList[k] = v
-		}
-	}
+// getCancelReplaceMessageList 退会処理用のユーザーリスト文字列を取得する
+func getCancelReplaceMessageList(filteredUserList map[string]int) string {
 	if len(filteredUserList) == 0 {
 		return "今週は退会対象者はいません！ :tada:"
 	}

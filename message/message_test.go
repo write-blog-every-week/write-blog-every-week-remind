@@ -106,46 +106,17 @@ func TestMakeResultSendText(t *testing.T) {
 	}
 }
 
-func Test_getReminderReplaceMessageListLessThanOrEqualToQuota(t *testing.T) {
-	tests := []struct {
-		name         string
-		maxBlogQuota int
-		list         map[string]int
-		want         string
-	}{
-		{
-			name:         "normalTest",
-			maxBlogQuota: 2,
-			list: map[string]int{
-				"hoge": 2,
-				"fuga": 3,
-			},
-			want: "<@hoge>さん    残り2記事\n",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := getReminderReplaceMessageListLessThanOrEqualToQuota(tt.maxBlogQuota, tt.list); got != tt.want {
-				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
-			}
-		})
-	}
-}
-
-func Test_getReminderReplaceMessageListGreaterThanQuota(t *testing.T) {
+func Test_getCancelReplaceMessageList(t *testing.T) {
 	type args struct {
 	}
 	tests := []struct {
 		name         string
-		maxBlogQuota int
 		list         map[string]int
 		want         string
 	}{
 		{
 			name:         "normalTest",
-			maxBlogQuota: 2,
 			list: map[string]int{
-				"hoge": 2,
 				"fuga": 3,
 			},
 			want: `残念ながら以下の方は退会となります :cry:
@@ -155,16 +126,13 @@ func Test_getReminderReplaceMessageListGreaterThanQuota(t *testing.T) {
 		},
 		{
 			name:         "zeroUserGreaterThanQuota",
-			maxBlogQuota: 2,
-			list: map[string]int{
-				"hoge": 2,
-			},
+			list: map[string]int{},
 			want: "今週は退会対象者はいません！ :tada:",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getReminderReplaceMessageListGreaterThanQuota(tt.maxBlogQuota, tt.list); got != tt.want {
+			if got := getCancelReplaceMessageList(tt.list); got != tt.want {
 				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
 			}
 		})
