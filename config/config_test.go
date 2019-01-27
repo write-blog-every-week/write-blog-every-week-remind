@@ -17,7 +17,7 @@ func Test_getConfigData(t *testing.T) {
 		{
 			name: "normalTest",
 			args: args{
-				configFile: "normalTest.tomltest",
+				configFile: "testdata/normalTest.tomltest",
 			},
 			want: ConfigData{
 				Slack: Slack{
@@ -38,7 +38,7 @@ func Test_getConfigData(t *testing.T) {
 		{
 			name: "noBlogConfig",
 			args: args{
-				configFile: "noBlogConfig.tomltest",
+				configFile: "testdata/noBlogConfig.tomltest",
 			},
 			want: ConfigData{
 				Slack: Slack{
