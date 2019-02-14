@@ -8,3 +8,6 @@ AccessKey = "XXXXXXXX"
 SecretKey = "XXXXXXXX"
 Region    = "XXXXXXXX"
 DataBase  = "XXXXXXXX"
+
+[Blog]
+MaxBlogQuota = 2
