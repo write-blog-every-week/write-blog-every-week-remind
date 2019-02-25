@@ -32,12 +32,12 @@ func Test_getConfigData(t *testing.T) {
 	}
 
 	resetFunc := []func(){}
-	resetFunc = append(resetFunc, setTestEnv("SLACK_API_URL", "send_api_url"))
-	resetFunc = append(resetFunc, setTestEnv("SLACK_CHANNEL_NAME", "channel_name"))
-	resetFunc = append(resetFunc, setTestEnv("AWS_ACCESS_KEY", "access_key"))
-	resetFunc = append(resetFunc, setTestEnv("AWS_SECRET_KEY", "secret_key"))
-	resetFunc = append(resetFunc, setTestEnv("DATABASE_REGION", "region"))
-	resetFunc = append(resetFunc, setTestEnv("DATABASE_NAME", "data_base"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_SLACK_API_URL", "send_api_url"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_SLACK_CHANNEL_NAME", "channel_name"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_AWS_ACCESS_KEY", "access_key"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_AWS_SECRET_KEY", "secret_key"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_DATABASE_REGION", "region"))
+	resetFunc = append(resetFunc, setTestEnv("WBEW_DATABASE_NAME", "data_base"))
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

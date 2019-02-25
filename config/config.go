@@ -36,14 +36,14 @@ func GetConfigData() ConfigData {
 func getConfigData() ConfigData {
 	// 後々awsConfigから取得するように変更したいが、一旦は環境変数から取得する
 	slack := Slack{
-		SendAPIURL:  os.Getenv("SLACK_API_URL"),
-		ChannelName: os.Getenv("SLACK_CHANNEL_NAME"),
+		SendAPIURL:  os.Getenv("WBEW_SLACK_API_URL"),
+		ChannelName: os.Getenv("WBEW_SLACK_CHANNEL_NAME"),
 	}
 	aws := AWS{
-		AccessKey: os.Getenv("AWS_ACCESS_KEY"),
-		SecretKey: os.Getenv("AWS_SECRET_KEY"),
-		Region:    os.Getenv("DATABASE_REGION"),
-		DataBase:  os.Getenv("DATABASE_NAME"),
+		AccessKey: os.Getenv("WBEW_AWS_ACCESS_KEY"),
+		SecretKey: os.Getenv("WBEW_AWS_SECRET_KEY"),
+		Region:    os.Getenv("WBEW_DATABASE_REGION"),
+		DataBase:  os.Getenv("WBEW_DATABASE_NAME"),
 	}
 	blog := Blog{
 		// デフォルト値を2019年1月現在の2週間に設定

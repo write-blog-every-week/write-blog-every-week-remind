@@ -50,7 +50,7 @@ func blogReminder() {
 // blogRegister ブログの登録ロジックを実行
 func blogRegister(_ context.Context, rawParams interface{}) (interface{}, error) {
 	configData := config.GetConfigData()
-	envToken := os.Getenv("SLACK_TOKEN")
+	envToken := os.Getenv("WBEW_SLACK_TOKEN")
 	params, err := slack.ParseSlackParams(rawParams)
 	if err != nil {
 		return "スラックのパラメータが取得できませんでした。 error: " + err.Error(), nil
