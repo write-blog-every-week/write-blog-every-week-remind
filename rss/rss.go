@@ -1,6 +1,7 @@
 package rss
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/mmcdole/gofeed"
@@ -10,12 +11,13 @@ import (
 
 var asiaTokyo, _ = time.LoadLocation("Asia/Tokyo")
 
+// Parser RSSの解析情報を返す
 type Parser interface {
 	ParseURL(url string) (feed *gofeed.Feed, err error)
 }
 
 type rssParser struct {
-	parser	*gofeed.Parser
+	parser *gofeed.Parser
 }
 
 func (rp *rssParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
@@ -23,18 +25,25 @@ func (rp *rssParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
 }
 
 // FindTargetUserList ブログを書いていないユーザーを取得する
-func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) map[string]int {
+func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) (map[string]int, []database.WriteBlogEveryWeek) {
 	rssParser := &rssParser{gofeed.NewParser()}
 	return findTargetUserList(allMemberDataList, targetMonday, rssParser)
 }
 
-func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) map[string]int {
+func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) (map[string]int, []database.WriteBlogEveryWeek) {
+	var errMembers []database.WriteBlogEveryWeek
 	results := make(map[string]int)
 	for _, wbem := range allMemberDataList {
 		// フィードを取得
 		feed, err := parser.ParseURL(wbem.FeedURL)
 		if err != nil {
-			panic("フィードが取得できませんでした。失敗したフィードURL => " + wbem.FeedURL)
+			fmt.Printf(
+				"フィードが取得できませんでした。失敗したフィードURL => %s:%s",
+				wbem.FeedURL, err.Error(),
+			)
+			errMembers = append(errMembers, wbem)
+			// ひとまずSKIPしておく
+			continue
 		}
 
 		// 全ユーザーの情報を入れるため初期化
@@ -51,7 +60,7 @@ func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 		}
 	}
 
-	return results
+	return results, errMembers
 }
 
 // getLatestFeedPubDate 最新フィードの公開日を取得する
