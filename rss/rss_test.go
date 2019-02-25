@@ -1,6 +1,9 @@
 package rss
 
 import (
+	"fmt"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,8 +20,8 @@ func parse(published string) time.Time {
 
 func item(published string) *gofeed.Item {
 	parsed := parse(published)
-	return &gofeed.Item {
-		Published: published,
+	return &gofeed.Item{
+		Published:       published,
 		PublishedParsed: &parsed,
 	}
 }
@@ -27,16 +30,16 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, asiaTokyo))
 	thisMonday := date.GetThisMonday()
 	tests := []struct {
-		name		 string
-		feed		 *gofeed.Feed
+		name         string
+		feed         *gofeed.Feed
 		requireCount int
-		want		 time.Time
+		want         time.Time
 	}{
 		{
-			name: "not enough feeds",
-			feed: &gofeed.Feed{},
+			name:         "not enough feeds",
+			feed:         &gofeed.Feed{},
 			requireCount: 0,
-			want: thisMonday,
+			want:         thisMonday,
 		},
 		{
 			name: "1 feed required and written",
@@ -46,7 +49,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 				},
 			},
 			requireCount: 0,
-			want: parse("Wed, 26 Dec 2018 19:00:00 +0900"),
+			want:         parse("Wed, 26 Dec 2018 19:00:00 +0900"),
 		},
 		{
 			name: "1 feed required and not written",
@@ -56,7 +59,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 				},
 			},
 			requireCount: 0,
-			want: parse("Wed, 19 Dec 2018 19:00:00 +0900"),
+			want:         parse("Wed, 19 Dec 2018 19:00:00 +0900"),
 		},
 		{
 			name: "2 feeds required and only 1 feed exists",
@@ -66,7 +69,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 				},
 			},
 			requireCount: 1,
-			want: thisMonday,
+			want:         thisMonday,
 		},
 		{
 			name: "2 feeds required and only 1 feed written this week",
@@ -77,7 +80,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 				},
 			},
 			requireCount: 1,
-			want: parse("Tue, 18 Dec 2018 19:00:00 +0900"),
+			want:         parse("Tue, 18 Dec 2018 19:00:00 +0900"),
 		},
 		{
 			name: "2 feeds required and written",
@@ -88,7 +91,7 @@ func TestGetLatestFeedPubDate(t *testing.T) {
 				},
 			},
 			requireCount: 1,
-			want: parse("Tue, 25 Dec 2018 19:00:00 +0900"),
+			want:         parse("Tue, 25 Dec 2018 19:00:00 +0900"),
 		},
 	}
 	for _, tt := range tests {
@@ -121,24 +124,42 @@ type mockParser struct {
 }
 
 func (mp *mockParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
+	if strings.Contains(url, "error from") {
+		return nil, fmt.Errorf("%s", url)
+	}
 	return parseMap[url], nil
 }
 
 func TestFindTargetUserList(t *testing.T) {
 	date.SetFakeTime(time.Date(2018, 12, 27, 0, 0, 0, 0, asiaTokyo))
 	thisMonday := parse("Mon, 24 Dec 2018 00:00:00 +0900")
+	user1 := database.WriteBlogEveryWeek{
+		UserID:       "user1",
+		FeedURL:      "2items",
+		RequireCount: 2,
+	}
+	user2 := database.WriteBlogEveryWeek{
+		UserID:  "user2",
+		FeedURL: "error from mock1",
+	}
+	user3 := database.WriteBlogEveryWeek{
+		UserID:  "user3",
+		FeedURL: "error from mock2",
+	}
 	tests := []struct {
-		name	string
-		members	[]database.WriteBlogEveryWeek
-		monday	time.Time
-		want	map[string]int
+		name            string
+		members         []database.WriteBlogEveryWeek
+		monday          time.Time
+		want            map[string]int
+		wantError       bool
+		wantErrMemebers []database.WriteBlogEveryWeek
 	}{
 		{
 			name: "0 required returns 0",
 			members: []database.WriteBlogEveryWeek{
 				database.WriteBlogEveryWeek{
-					UserID: "user1",
-					FeedURL: "1item",
+					UserID:       "user1",
+					FeedURL:      "1item",
 					RequireCount: 0,
 				},
 			},
@@ -151,13 +172,13 @@ func TestFindTargetUserList(t *testing.T) {
 			name: "required 1 more returns 1",
 			members: []database.WriteBlogEveryWeek{
 				database.WriteBlogEveryWeek{
-					UserID: "user1",
-					FeedURL: "noitem",
+					UserID:       "user1",
+					FeedURL:      "noitem",
 					RequireCount: 1,
 				},
 				database.WriteBlogEveryWeek{
-					UserID: "user2",
-					FeedURL: "1item",
+					UserID:       "user2",
+					FeedURL:      "1item",
 					RequireCount: 2,
 				},
 			},
@@ -171,8 +192,8 @@ func TestFindTargetUserList(t *testing.T) {
 			name: "2 required 2 written returns 0",
 			members: []database.WriteBlogEveryWeek{
 				database.WriteBlogEveryWeek{
-					UserID: "user1",
-					FeedURL: "2items",
+					UserID:       "user1",
+					FeedURL:      "2items",
 					RequireCount: 2,
 				},
 			},
@@ -181,15 +202,38 @@ func TestFindTargetUserList(t *testing.T) {
 				"user1": 0,
 			},
 		},
+		{
+			name: "hanldle errors",
+			members: []database.WriteBlogEveryWeek{
+				user1,
+				user2,
+				user3,
+			},
+			monday: thisMonday,
+			want: map[string]int{
+				user1.UserID: 0,
+			},
+			wantError: true,
+			wantErrMemebers: []database.WriteBlogEveryWeek{
+				user2,
+				user3,
+			},
+		},
 	}
 	parser := &mockParser{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := findTargetUserList(tt.members, tt.monday, parser)
+			got, errs := findTargetUserList(tt.members, tt.monday, parser)
 			for k, v := range got {
 				if v != tt.want[k] {
 					t.Errorf("want \n%d for %s\n, but got \n%d\n", tt.want[k], k, v)
 				}
+			}
+			if !tt.wantError && len(errs) != 0 {
+				t.Errorf("want no error, but got %d\n", len(errs))
+			}
+			if tt.wantError && !reflect.DeepEqual(errs, tt.wantErrMemebers) {
+				t.Fatalf("want %#v, but got %v\n", tt.wantErrMemebers, errs)
 			}
 		})
 	}

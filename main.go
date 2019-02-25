@@ -34,7 +34,7 @@ func blogReminder() {
 	thisMonday := date.GetThisMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
-	targetUserList := rss.FindTargetUserList(allMemberDataList, thisMonday)
+	targetUserList, _ := rss.FindTargetUserList(allMemberDataList, thisMonday)
 
 	for u, c := range targetUserList {
 		if c == 0 {
@@ -72,7 +72,7 @@ func blogResult() {
 	lastWeekMonday := date.GetLastWeekMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
-	targetUserList := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
+	targetUserList, _ := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
 
 	for userID := range targetUserList {
 		// 0の人は1になり、1以上の人は1記事増える
