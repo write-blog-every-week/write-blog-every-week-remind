@@ -19,7 +19,7 @@
 /vendor/
 /Godeps/
 
-*.toml
+.envrc
 *.zip
 # End of https://www.gitignore.io/api/go
 

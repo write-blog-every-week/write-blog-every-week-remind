@@ -1,6 +1,6 @@
 package config
 
-import "github.com/BurntSushi/toml"
+import "os"
 
 // ConfigData Base
 type ConfigData struct {
@@ -30,20 +30,28 @@ type Blog struct {
 
 // GetConfigData 設定データを取得する
 func GetConfigData() ConfigData {
-	return getConfigData("config.toml")
+	return getConfigData()
 }
 
-func getConfigData(configFile string) ConfigData {
-	var configData ConfigData
-	_, err := toml.DecodeFile(configFile, &configData)
-	if err != nil {
-		panic("tomlファイルを読み込めません")
+func getConfigData() ConfigData {
+	// 後々awsConfigから取得するように変更したいが、一旦は環境変数から取得する
+	slack := Slack{
+		SendAPIURL:  os.Getenv("SLACK_API_URL"),
+		ChannelName: os.Getenv("SLACK_CHANNEL_NAME"),
 	}
-
-	// 設定値がない場合、デフォルト値を2019年1月現在の2週間に設定
-	if configData.Blog.MaxBlogQuota == 0 {
-		configData.Blog.MaxBlogQuota = 2
+	aws := AWS{
+		AccessKey: os.Getenv("AWS_ACCESS_KEY"),
+		SecretKey: os.Getenv("AWS_SECRET_KEY"),
+		Region:    os.Getenv("DATABASE_REGION"),
+		DataBase:  os.Getenv("DATABASE_NAME"),
 	}
-
-	return configData
+	blog := Blog{
+		// デフォルト値を2019年1月現在の2週間に設定
+		MaxBlogQuota: 2,
+	}
+	return ConfigData{
+		Slack: slack,
+		AWS:   aws,
+		Blog:  blog,
+	}
 }
