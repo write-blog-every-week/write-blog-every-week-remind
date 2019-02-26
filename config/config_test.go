@@ -31,14 +31,15 @@ func Test_getConfigData(t *testing.T) {
 		},
 	}
 
-	resetFunc := []func(){}
-	resetFunc = append(resetFunc, setTestEnv("WBEW_SLACK_API_URL", "send_api_url"))
-	resetFunc = append(resetFunc, setTestEnv("WBEW_SLACK_CHANNEL_NAME", "channel_name"))
-	resetFunc = append(resetFunc, setTestEnv("WBEW_AWS_ACCESS_KEY", "access_key"))
-	resetFunc = append(resetFunc, setTestEnv("WBEW_AWS_SECRET_KEY", "secret_key"))
-	resetFunc = append(resetFunc, setTestEnv("WBEW_DATABASE_REGION", "region"))
-	resetFunc = append(resetFunc, setTestEnv("WBEW_DATABASE_NAME", "data_base"))
-
+	envs := map[string]string{
+		"WBEW_SLACK_API_URL":      "send_api_url",
+		"WBEW_SLACK_CHANNEL_NAME": "channel_name",
+		"WBEW_AWS_ACCESS_KEY":     "access_key",
+		"WBEW_AWS_SECRET_KEY":     "secret_key",
+		"WBEW_DATABASE_REGION":    "region",
+		"WBEW_DATABASE_NAME":      "data_base",
+	}
+	defer setup(envs)()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getConfigData(); !reflect.DeepEqual(got, tt.want) {
@@ -46,16 +47,17 @@ func Test_getConfigData(t *testing.T) {
 			}
 		})
 	}
-
-	for _, f := range resetFunc {
-		f()
-	}
 }
 
-func setTestEnv(key string, val string) func() {
-	preVal := os.Getenv(key)
-	os.Setenv(key, val)
+func setup(envs map[string]string) func() {
+	pre := map[string]string{}
+	for k, v := range envs {
+		pre[k] = os.Getenv(k)
+		os.Setenv(k, v)
+	}
 	return func() {
-		os.Setenv(key, preVal)
+		for k, v := range pre {
+			os.Setenv(k, v)
+		}
 	}
 }
