@@ -152,7 +152,7 @@ func TestFindTargetUserList(t *testing.T) {
 		monday          time.Time
 		want            map[string]int
 		wantError       bool
-		wantErrMemebers []database.WriteBlogEveryWeek
+		wantErrMemebers []*database.WriteBlogEveryWeek
 	}{
 		{
 			name: "0 required returns 0",
@@ -203,7 +203,7 @@ func TestFindTargetUserList(t *testing.T) {
 			},
 		},
 		{
-			name: "hanldle errors",
+			name: "handle errors",
 			members: []database.WriteBlogEveryWeek{
 				user1,
 				user2,
@@ -214,9 +214,9 @@ func TestFindTargetUserList(t *testing.T) {
 				user1.UserID: 0,
 			},
 			wantError: true,
-			wantErrMemebers: []database.WriteBlogEveryWeek{
-				user2,
-				user3,
+			wantErrMemebers: []*database.WriteBlogEveryWeek{
+				&user2,
+				&user3,
 			},
 		},
 	}
@@ -233,7 +233,7 @@ func TestFindTargetUserList(t *testing.T) {
 				t.Errorf("want no error, but got %d\n", len(errs))
 			}
 			if tt.wantError && !reflect.DeepEqual(errs, tt.wantErrMemebers) {
-				t.Fatalf("want %#v, but got %v\n", tt.wantErrMemebers, errs)
+				t.Errorf("want %#v, but got %v\n", tt.wantErrMemebers, errs)
 			}
 		})
 	}

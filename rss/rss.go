@@ -25,15 +25,15 @@ func (rp *rssParser) ParseURL(url string) (feed *gofeed.Feed, err error) {
 }
 
 // FindTargetUserList ブログを書いていないユーザーを取得する
-func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) (map[string]int, []database.WriteBlogEveryWeek) {
+func FindTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time) (map[string]int, []*database.WriteBlogEveryWeek) {
 	rssParser := &rssParser{gofeed.NewParser()}
 	return findTargetUserList(allMemberDataList, targetMonday, rssParser)
 }
 
-func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) (map[string]int, []database.WriteBlogEveryWeek) {
-	var errMembers []database.WriteBlogEveryWeek
+func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetMonday time.Time, parser Parser) (map[string]int, []*database.WriteBlogEveryWeek) {
+	var errMembers []*database.WriteBlogEveryWeek
 	results := make(map[string]int)
-	for _, wbem := range allMemberDataList {
+	for i, wbem := range allMemberDataList {
 		// フィードを取得
 		feed, err := parser.ParseURL(wbem.FeedURL)
 		if err != nil {
@@ -41,7 +41,7 @@ func findTargetUserList(allMemberDataList []database.WriteBlogEveryWeek, targetM
 				"フィードが取得できませんでした。失敗したフィードURL => %s:%s",
 				wbem.FeedURL, err.Error(),
 			)
-			errMembers = append(errMembers, wbem)
+			errMembers = append(errMembers, &allMemberDataList[i])
 			// ひとまずSKIPしておく
 			continue
 		}

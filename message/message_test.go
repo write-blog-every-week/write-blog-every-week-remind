@@ -2,6 +2,8 @@ package message
 
 import (
 	"testing"
+
+	"github.com/write-blog-every-week/write-blog-every-week-remind/database"
 )
 
 func TestMakeReminderSendText(t *testing.T) {
@@ -38,15 +40,15 @@ func TestMakeReminderSendText(t *testing.T) {
 		{
 			name: "tenUsers",
 			list: map[string]int{
-				"user1": 1,
-				"user2": 2,
-				"user3": 3,
-				"user4": 4,
-				"user5": 5,
-				"user6": 6,
-				"user7": 7,
-				"user8": 8,
-				"user9": 9,
+				"user1":  1,
+				"user2":  2,
+				"user3":  3,
+				"user4":  4,
+				"user5":  5,
+				"user6":  6,
+				"user7":  7,
+				"user8":  8,
+				"user9":  9,
 				"user10": 10,
 			},
 			want: `
@@ -142,12 +144,12 @@ func Test_getCancelReplaceMessageList(t *testing.T) {
 	type args struct {
 	}
 	tests := []struct {
-		name         string
-		list         map[string]int
-		want         string
+		name string
+		list map[string]int
+		want string
 	}{
 		{
-			name:         "normalTest",
+			name: "normalTest",
 			list: map[string]int{
 				"fuga": 3,
 			},
@@ -157,7 +159,7 @@ func Test_getCancelReplaceMessageList(t *testing.T) {
 ================`,
 		},
 		{
-			name:         "zeroUserGreaterThanQuota",
+			name: "zeroUserGreaterThanQuota",
 			list: map[string]int{},
 			want: "今週は退会対象者はいません！ :tada:",
 		},
@@ -202,6 +204,45 @@ func TestGetRminderReplaceMessageList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getReminderReplaceMessageList(tt.list); got != tt.want {
+				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
+			}
+		})
+	}
+}
+
+func TestCreateFailedRSSMessage(t *testing.T) {
+	tests := []struct {
+		name string
+		list []*database.WriteBlogEveryWeek
+		want string
+	}{
+		{
+			name: "multiple",
+			list: []*database.WriteBlogEveryWeek{
+				&database.WriteBlogEveryWeek{
+					UserID:       "hoge",
+					UserName:     "budougumi0617",
+					FeedURL:      "https://budougumi0617.github.io/index.xml",
+					RequireCount: 1,
+				},
+				&database.WriteBlogEveryWeek{
+					UserID:       "hoge",
+					UserName:     "budougumi0618",
+					FeedURL:      "https://budougumi0618.github.io/index.xml",
+					RequireCount: 1,
+				},
+			},
+			want: `以下の方々のRSSの読み込みに失敗しました :scream:
+================
+<@budougumi0617>:    https://budougumi0617.github.io/index.xml
+<@budougumi0618>:    https://budougumi0618.github.io/index.xml
+================
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CreateFailedRSSMessage(tt.list); got != tt.want {
 				t.Errorf("want \n%s\n, but got \n%s\n", tt.want, got)
 			}
 		})

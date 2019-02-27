@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sort"
 	"text/tabwriter"
+
+	"github.com/write-blog-every-week/write-blog-every-week-remind/database"
 )
 
 // MakeReminderSendText Slackへリマインダーを送信する用のメッセージを作成する
@@ -82,5 +84,24 @@ func getReminderReplaceMessageList(targetUserList map[string]int) string {
 		return fmt.Sprintf("リスト生成に失敗 %+v\n", targetUserList)
 	}
 
+	return buf.String()
+}
+
+// CreateFailedRSSMessage RSSが読み込めなかったときの通知メッセージを生成する
+func CreateFailedRSSMessage(members []*database.WriteBlogEveryWeek) string {
+	line := []byte("================\n")
+
+	var buf bytes.Buffer
+	tw := tabwriter.NewWriter(&buf, 0, 4, 4, ' ', 0)
+	tw.Write([]byte("以下の方々のRSSの読み込みに失敗しました :scream:\n"))
+	tw.Write(line)
+	for _, m := range members {
+		tw.Write([]byte(fmt.Sprintf("<@%s>:\t%s\n", m.UserName, m.FeedURL)))
+	}
+	tw.Write(line)
+	if err := tw.Flush(); err != nil {
+		fmt.Printf("TabWriter failed by %v", err)
+		return fmt.Sprintf("%d人のRSSの読み込みに失敗しました :scream:\n", len(members))
+	}
 	return buf.String()
 }
