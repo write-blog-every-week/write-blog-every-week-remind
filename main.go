@@ -34,7 +34,7 @@ func blogReminder() {
 	thisMonday := date.GetThisMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
-	targetUserList, _ := rss.FindTargetUserList(allMemberDataList, thisMonday)
+	targetUserList, errMembers := rss.FindTargetUserList(allMemberDataList, thisMonday)
 
 	for u, c := range targetUserList {
 		if c == 0 {
@@ -44,6 +44,12 @@ func blogReminder() {
 
 	sendText := message.MakeReminderSendText(targetUserList)
 	slack.SendMessage(configData, sendText)
+	if len(errMembers) != 0 {
+		slack.SendMessage(
+			configData,
+			message.CreateFailedRSSMessage(errMembers),
+		)
+	}
 	// fmt.Println(sendText)
 }
 
@@ -72,7 +78,7 @@ func blogResult() {
 	lastWeekMonday := date.GetLastWeekMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
-	targetUserList, _ := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
+	targetUserList, errMembers := rss.FindTargetUserList(allMemberDataList, lastWeekMonday)
 
 	for userID := range targetUserList {
 		// 0の人は1になり、1以上の人は1記事増える
@@ -82,5 +88,11 @@ func blogResult() {
 	database.ResetRequireCount(configData, targetUserList)
 	sendText := message.MakeResultSendText(configData.Blog.MaxBlogQuota, targetUserList)
 	slack.SendMessage(configData, sendText)
+	if len(errMembers) != 0 {
+		slack.SendMessage(
+			configData,
+			message.CreateFailedRSSMessage(errMembers),
+		)
+	}
 	// fmt.Println(sendText)
 }
