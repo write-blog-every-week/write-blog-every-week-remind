@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -24,6 +25,8 @@ func main() {
 	} else if executeFunction == "result" {
 		lambda.Start(blogResult)
 		// blogResult()
+	} else if executeFunction == "delete" {
+		lambda.Start(blogDelete)
 	} else {
 		panic("環境変数 GOLANG_EXECUTE_FUNCTION が取得出来ないか、期待した値ではありません。")
 	}
@@ -95,4 +98,25 @@ func blogResult() {
 		)
 	}
 	// fmt.Println(sendText)
+}
+
+// blogDelete ブログの削除ロジックを実行
+func blogDelete(_ context.Context, rawParams interface{}) (interface{}, error) {
+	configData := config.GetConfigData()
+	envToken := os.Getenv("WBEW_SLACK_TOKEN")
+	params, err := slack.ParseSlackParams(rawParams)
+	if err != nil {
+		return "スラックのパラメータが取得できませんでした。 error: " + err.Error(), nil
+	}
+	if envToken != params.Token {
+		return "トークンの不一致", nil
+	}
+	allMemberDataList := database.FindAll(configData)
+	for _, m := range allMemberDataList {
+		if m.UserName == params.Text {
+			database.DeleteUser(configData, m)
+			return fmt.Sprintf("%sさんのブログを削除しました :cry:", params.Text), nil
+		}
+	}
+	return fmt.Sprintf("該当するユーザーが登録されていません: %s", params.Text), nil
 }

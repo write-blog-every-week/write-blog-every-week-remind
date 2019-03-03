@@ -69,6 +69,7 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 		UserID:   params["user_id"][0],
 		UserName: params["user_name"][0],
 		// Slash CommandでURL形式を送ると <URL>という形式になるので、先頭と末尾をtrimする
-		Text: strings.TrimRight(strings.TrimLeft(params["text"][0], "<"), ">"),
+		// また、ユーザー名が送られてきた場合は、先頭の@をtrimする
+		Text: strings.TrimRight(strings.TrimLeft(strings.TrimLeft(params["text"][0], "@"), "<"), ">"),
 	}, nil
 }
