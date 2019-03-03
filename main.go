@@ -101,7 +101,7 @@ func blogResult() {
 }
 
 // blogDelete ブログの削除ロジックを実行
-func blogDelete(_ context.Context, rawParams interface{}) (interface{}, error) {
+func blogDelete(_ context.Context, rawParams interface{}) (string, error) {
 	configData := config.GetConfigData()
 	envToken := os.Getenv("WBEW_SLACK_TOKEN")
 	params, err := slack.ParseSlackParams(rawParams)
