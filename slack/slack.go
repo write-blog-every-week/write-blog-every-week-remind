@@ -3,6 +3,7 @@ package slack
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -64,12 +65,14 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 		return
 	}
 
-	return &SlackParams{
+	slackParams := SlackParams{
 		Token:    params["token"][0],
 		UserID:   params["user_id"][0],
 		UserName: params["user_name"][0],
 		// Slash CommandでURL形式を送ると <URL>という形式になるので、先頭と末尾をtrimする
 		// また、ユーザー名が送られてきた場合は、先頭の@をtrimする
 		Text: strings.TrimRight(strings.TrimLeft(strings.TrimLeft(params["text"][0], "@"), "<"), ">"),
-	}, nil
+	}
+	fmt.Printf("SlackParams: %v", slackParams)
+	return &slackParams, nil
 }
