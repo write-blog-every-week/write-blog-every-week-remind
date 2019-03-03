@@ -114,7 +114,9 @@ func blogDelete(_ context.Context, rawParams interface{}) (interface{}, error) {
 	allMemberDataList := database.FindAll(configData)
 	for _, m := range allMemberDataList {
 		if m.UserName == params.Text {
-			database.DeleteUser(configData, m)
+			if err := database.DeleteUser(configData, m); err != nil {
+				return fmt.Sprintf("削除エラー => %v", err), nil
+			}
 			return fmt.Sprintf("%sさんのブログを削除しました :cry:", params.Text), nil
 		}
 	}

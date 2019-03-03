@@ -63,11 +63,9 @@ func CreateUser(configData config.ConfigData, slackParams *slack.SlackParams) {
 }
 
 // DeleteUser ユーザーデータを削除する
-func DeleteUser(configData config.ConfigData, member WriteBlogEveryWeek) {
+func DeleteUser(configData config.ConfigData, member WriteBlogEveryWeek) error {
 	table := getTableObject(configData)
-	if err := table.Delete("user_id", member.UserID).Run(); err != nil {
-		panic("削除エラー => " + err.Error())
-	}
+	return table.Delete("user_id", member.UserID).Run()
 }
 
 /**
