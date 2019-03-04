@@ -114,10 +114,12 @@ func blogDelete(_ context.Context, rawParams interface{}) (string, error) {
 	allMemberDataList := database.FindAll(configData)
 	for _, m := range allMemberDataList {
 		if m.UserName == params.Text {
+			fmt.Printf("Deleting User %v\n", m)
 			if err := database.DeleteUser(configData, m); err != nil {
-				return fmt.Sprintf("削除エラー => %v", err), nil
+				fmt.Printf("DeleteUser failed by %v\n", err)
+				return "データ削除時にエラーが発生しました", nil
 			}
-			return fmt.Sprintf("%sさんのブログを削除しました :cry:", params.Text), nil
+			return fmt.Sprintf("%sさんのブログ %s を削除しました :cry:", params.Text, m.FeedURL), nil
 		}
 	}
 	return fmt.Sprintf("該当するユーザーが登録されていません: %s", params.Text), nil

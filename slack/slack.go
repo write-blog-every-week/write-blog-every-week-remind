@@ -73,6 +73,6 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 		// また、ユーザー名が送られてきた場合は、先頭の@をtrimする
 		Text: strings.TrimRight(strings.TrimLeft(strings.TrimLeft(params["text"][0], "@"), "<"), ">"),
 	}
-	fmt.Printf("SlackParams: %v", slackParams)
+	fmt.Printf("SlackParams: UserID=%s, UserName=%s, Text=%s\n", slackParams.UserID, slackParams.UserName, slackParams.Text)
 	return &slackParams, nil
 }
