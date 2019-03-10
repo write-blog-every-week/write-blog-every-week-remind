@@ -62,6 +62,12 @@ func CreateUser(configData config.ConfigData, slackParams *slack.SlackParams) {
 	}
 }
 
+// DeleteUser ユーザーデータを削除する
+func DeleteUser(configData config.ConfigData, member WriteBlogEveryWeek) error {
+	table := getTableObject(configData)
+	return table.Delete("user_id", member.UserID).Run()
+}
+
 /**
  * DynamoDBのテーブルオブジェクトを取得する
  */
