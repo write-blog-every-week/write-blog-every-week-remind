@@ -1,8 +1,14 @@
 package slack
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	"github.com/write-blog-every-week/write-blog-every-week-remind/config"
 )
 
 func TestParseSlackParams(t *testing.T) {
@@ -77,6 +83,61 @@ func TestParseSlackParams(t *testing.T) {
 			}
 			if !reflect.DeepEqual(gotResult, tt.wantResult) {
 				t.Errorf("ParseSlackParams() = %v, want %v", gotResult, tt.wantResult)
+			}
+		})
+	}
+}
+
+func TestSendMessage(t *testing.T) {
+	type body struct {
+		Text      string `json:"text"`
+		Channel   string `json:"channel"`
+		LinkNames string `json:"link_names"`
+	}
+	got := make(map[string]string)
+	h := func(w http.ResponseWriter, r *http.Request) {
+		bodyStr, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Errorf("Unexpected error = %v", err)
+		}
+		var b body
+		if err := json.Unmarshal(bodyStr, &b); err != nil {
+			t.Errorf("Unexpected error = %v", err)
+		}
+		got[b.Channel] = b.Text
+		w.WriteHeader(http.StatusOK)
+	}
+	testServer := httptest.NewServer(http.HandlerFunc(h))
+	defer testServer.Close()
+
+	type args struct {
+		configData config.ConfigData
+		sendText   string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "normal",
+			args: args{
+				configData: config.ConfigData{
+					Slack: config.Slack{
+						SendAPIURL:  testServer.URL,
+						ChannelName: "c1",
+					},
+					AWS:  config.AWS{},
+					Blog: config.Blog{},
+				},
+				sendText: "hello slack",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			SendMessage(tt.args.configData, tt.args.sendText)
+			if got[tt.args.configData.Slack.ChannelName] != tt.args.sendText {
+				t.Errorf("Got = %v, wantChannel = %s, wantSendText = %s", got, tt.args.configData.Slack.ChannelName, tt.args.sendText)
 			}
 		})
 	}
