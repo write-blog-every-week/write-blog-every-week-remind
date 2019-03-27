@@ -36,7 +36,7 @@ func SendMessage(configData config.ConfigData, sendText string) {
 	}
 	jsonStr, err := json.Marshal(body)
 	if err != nil {
-		panic("hoge")
+		panic("json文字列の作成に失敗しました。")
 	}
 
 	// 通知を実行する
