@@ -2,6 +2,7 @@ package slack
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -19,16 +20,30 @@ type SlackParams struct {
 	Text     string
 }
 
+type slackBody struct {
+	Text      string `json:"text"`
+	Channel   string `json:"channel"`
+	LinkNames string `json:"link_names"`
+}
+
 // SendMessage Slackの特定チャンネルにメッセージを投稿する
 func SendMessage(configData config.ConfigData, sendText string) {
 	// JSONとしてパラメータを設定
-	jsonStr := `{"text":"` + sendText + `","channel":"` + configData.Slack.ChannelName + `","link_names":"1"}`
+	body := &slackBody{
+		Text:      sendText,
+		Channel:   configData.Slack.ChannelName,
+		LinkNames: "1",
+	}
+	jsonStr, err := json.Marshal(body)
+	if err != nil {
+		panic("hoge")
+	}
 
 	// 通知を実行する
 	request, newRequestError := http.NewRequest(
 		"POST",
 		configData.Slack.SendAPIURL,
-		bytes.NewBuffer([]byte(jsonStr)),
+		bytes.NewBuffer(jsonStr),
 	)
 	if newRequestError != nil {
 		panic("newRequestErrorのリクエスト作成に失敗しました。")

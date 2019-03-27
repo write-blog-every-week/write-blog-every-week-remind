@@ -89,22 +89,17 @@ func TestParseSlackParams(t *testing.T) {
 }
 
 func TestSendMessage(t *testing.T) {
-	type body struct {
-		Text      string `json:"text"`
-		Channel   string `json:"channel"`
-		LinkNames string `json:"link_names"`
-	}
 	got := make(map[string]string)
 	h := func(w http.ResponseWriter, r *http.Request) {
 		bodyStr, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			t.Errorf("Unexpected error = %v", err)
 		}
-		var b body
-		if err := json.Unmarshal(bodyStr, &b); err != nil {
+		var body slackBody
+		if err := json.Unmarshal(bodyStr, &body); err != nil {
 			t.Errorf("Unexpected error = %v", err)
 		}
-		got[b.Channel] = b.Text
+		got[body.Channel] = body.Text
 		w.WriteHeader(http.StatusOK)
 	}
 	testServer := httptest.NewServer(http.HandlerFunc(h))
