@@ -110,8 +110,9 @@ func TestSendMessage(t *testing.T) {
 		sendText   string
 	}
 	tests := []struct {
-		name string
-		args args
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "normal",
@@ -126,11 +127,29 @@ func TestSendMessage(t *testing.T) {
 				},
 				sendText: "hello slack",
 			},
+			wantErr: false,
+		},
+		{
+			name: "urlParseError",
+			args: args{
+				configData: config.ConfigData{
+					Slack: config.Slack{
+						SendAPIURL:  string(0x31),
+						ChannelName: "",
+					},
+				},
+				sendText: "",
+			},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			SendMessage(tt.args.configData, tt.args.sendText)
+			err := SendMessage(tt.args.configData, tt.args.sendText)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("SendMessage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
 			if got[tt.args.configData.Slack.ChannelName] != tt.args.sendText {
 				t.Errorf("Got = %v, wantChannel = %s, wantSendText = %s", got, tt.args.configData.Slack.ChannelName, tt.args.sendText)
 			}

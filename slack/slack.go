@@ -27,7 +27,7 @@ type slackBody struct {
 }
 
 // SendMessage Slackの特定チャンネルにメッセージを投稿する
-func SendMessage(configData config.ConfigData, sendText string) {
+func SendMessage(configData config.ConfigData, sendText string) error {
 	// JSONとしてパラメータを設定
 	body := &slackBody{
 		Text:      sendText,
@@ -36,7 +36,7 @@ func SendMessage(configData config.ConfigData, sendText string) {
 	}
 	jsonStr, err := json.Marshal(body)
 	if err != nil {
-		panic("json文字列の作成に失敗しました。")
+		return errors.New("json文字列の作成に失敗しました。")
 	}
 
 	// 通知を実行する
@@ -46,7 +46,7 @@ func SendMessage(configData config.ConfigData, sendText string) {
 		bytes.NewBuffer(jsonStr),
 	)
 	if newRequestError != nil {
-		panic("newRequestErrorのリクエスト作成に失敗しました。")
+		return errors.New("newRequestErrorのリクエスト作成に失敗しました。")
 	}
 	defer request.Body.Close()
 
@@ -54,10 +54,11 @@ func SendMessage(configData config.ConfigData, sendText string) {
 	client := &http.Client{}
 	response, doSendError := client.Do(request)
 	if doSendError != nil {
-		panic("SendMessageのリクエスト実行に失敗しました。")
+		return errors.New("SendMessageのリクエスト実行に失敗しました。")
 	}
 
 	defer response.Body.Close()
+	return nil
 }
 
 // ParseSlackParams Slackから送られたパラメータをパースする

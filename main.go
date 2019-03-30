@@ -33,7 +33,7 @@ func main() {
 }
 
 // blogReminder ブログのリマインダーロジックを実行
-func blogReminder() {
+func blogReminder() error {
 	thisMonday := date.GetThisMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
@@ -46,14 +46,21 @@ func blogReminder() {
 	}
 
 	sendText := message.MakeReminderSendText(targetUserList)
-	slack.SendMessage(configData, sendText)
+	err := slack.SendMessage(configData, sendText)
+	if err != nil {
+		return err
+	}
 	if len(errMembers) != 0 {
-		slack.SendMessage(
+		err := slack.SendMessage(
 			configData,
 			message.CreateFailedRSSMessage(errMembers),
 		)
+		if err != nil {
+			return err
+		}
 	}
 	// fmt.Println(sendText)
+	return nil
 }
 
 // blogRegister ブログの登録ロジックを実行
@@ -77,7 +84,7 @@ func blogRegister(_ context.Context, rawParams interface{}) (interface{}, error)
 }
 
 // blogResult ブログ書けたかどうか通知のロジックを実行
-func blogResult() {
+func blogResult() error {
 	lastWeekMonday := date.GetLastWeekMonday()
 	configData := config.GetConfigData()
 	allMemberDataList := database.FindAll(configData)
@@ -90,14 +97,21 @@ func blogResult() {
 
 	database.ResetRequireCount(configData, targetUserList)
 	sendText := message.MakeResultSendText(configData.Blog.MaxBlogQuota, targetUserList)
-	slack.SendMessage(configData, sendText)
+	err := slack.SendMessage(configData, sendText)
+	if err != nil {
+		return err
+	}
 	if len(errMembers) != 0 {
-		slack.SendMessage(
+		err := slack.SendMessage(
 			configData,
 			message.CreateFailedRSSMessage(errMembers),
 		)
+		if err != nil {
+			return err
+		}
 	}
 	// fmt.Println(sendText)
+	return nil
 }
 
 // blogDelete ブログの削除ロジックを実行
