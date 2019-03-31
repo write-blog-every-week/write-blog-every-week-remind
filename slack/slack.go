@@ -70,12 +70,7 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 		return
 	}
 	rawQueryString := tmp["body"].(string)
-	parsed, err := url.QueryUnescape(rawQueryString)
-	if err != nil {
-		err = errors.New("params body unescape failed. body: " + rawQueryString)
-		return
-	}
-	params, err := url.ParseQuery(parsed)
+	params, err := url.ParseQuery(rawQueryString)
 	if err != nil {
 		err = errors.New("params body parse failed. body: " + rawQueryString)
 		return
