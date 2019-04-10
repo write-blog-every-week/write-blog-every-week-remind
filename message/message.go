@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/write-blog-every-week/write-blog-every-week-remind/database"
@@ -73,12 +74,14 @@ func getReminderReplaceMessageList(targetUserList map[string]int) string {
 	var buf bytes.Buffer
 	tw := tabwriter.NewWriter(&buf, 0, 4, 4, ' ', 0)
 	names := make([]string, 0, len(targetUserList))
+	sep := "::"
 	for name := range targetUserList {
-		names = append(names, name)
+		names = append(names, fmt.Sprintf("%d", targetUserList[name])+sep+name)
 	}
-	sort.Strings(names) //sort by key
+	sort.Sort(sort.Reverse(sort.StringSlice(names))) //sort by key: count + "::" + name
 	for _, n := range names {
-		tw.Write([]byte(fmt.Sprintf("<@%s>さん\t残り%d記事\n", n, targetUserList[n])))
+		countAndName := strings.Split(n, sep)
+		tw.Write([]byte(fmt.Sprintf("<@%s>さん\t残り%s記事\n", countAndName[1], countAndName[0])))
 	}
 	if err := tw.Flush(); err != nil {
 		return fmt.Sprintf("リスト生成に失敗 %+v\n", targetUserList)
