@@ -72,13 +72,18 @@ func getCancelReplaceMessageList(filteredUserList map[string]int) string {
 func getReminderReplaceMessageList(targetUserList map[string]int) string {
 	var buf bytes.Buffer
 	tw := tabwriter.NewWriter(&buf, 0, 4, 4, ' ', 0)
-	names := make([]string, 0, len(targetUserList))
-	for name := range targetUserList {
-		names = append(names, name)
+	ms := make([]database.WriteBlogEveryWeek, 0, len(targetUserList))
+	for n, c := range targetUserList {
+		ms = append(ms, database.WriteBlogEveryWeek{UserName: n, RequireCount: c})
 	}
-	sort.Strings(names) //sort by key
-	for _, n := range names {
-		tw.Write([]byte(fmt.Sprintf("<@%s>さん\t残り%d記事\n", n, targetUserList[n])))
+	sort.Slice(ms, func(i, j int) bool {
+		return ms[i].UserName > ms[j].UserName
+	})
+	sort.SliceStable(ms, func(i, j int) bool {
+		return ms[i].RequireCount > ms[j].RequireCount
+	})
+	for _, m := range ms {
+		tw.Write([]byte(fmt.Sprintf("<@%s>さん\t残り%d記事\n", m.UserName, m.RequireCount)))
 	}
 	if err := tw.Flush(); err != nil {
 		return fmt.Sprintf("リスト生成に失敗 %+v\n", targetUserList)
