@@ -2,6 +2,7 @@ package slack
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -19,19 +20,33 @@ type SlackParams struct {
 	Text     string
 }
 
+type slackBody struct {
+	Text      string `json:"text"`
+	Channel   string `json:"channel"`
+	LinkNames string `json:"link_names"`
+}
+
 // SendMessage Slackの特定チャンネルにメッセージを投稿する
-func SendMessage(configData config.ConfigData, sendText string) {
+func SendMessage(configData config.ConfigData, sendText string) error {
 	// JSONとしてパラメータを設定
-	jsonStr := `{"text":"` + sendText + `","channel":"` + configData.Slack.ChannelName + `","link_names":"1"}`
+	body := &slackBody{
+		Text:      sendText,
+		Channel:   configData.Slack.ChannelName,
+		LinkNames: "1",
+	}
+	jsonStr, err := json.Marshal(body)
+	if err != nil {
+		return errors.New("json文字列の作成に失敗しました。")
+	}
 
 	// 通知を実行する
 	request, newRequestError := http.NewRequest(
 		"POST",
 		configData.Slack.SendAPIURL,
-		bytes.NewBuffer([]byte(jsonStr)),
+		bytes.NewBuffer(jsonStr),
 	)
 	if newRequestError != nil {
-		panic("newRequestErrorのリクエスト作成に失敗しました。")
+		return errors.New("newRequestErrorのリクエスト作成に失敗しました。")
 	}
 	defer request.Body.Close()
 
@@ -39,10 +54,11 @@ func SendMessage(configData config.ConfigData, sendText string) {
 	client := &http.Client{}
 	response, doSendError := client.Do(request)
 	if doSendError != nil {
-		panic("SendMessageのリクエスト実行に失敗しました。")
+		return errors.New("SendMessageのリクエスト実行に失敗しました。")
 	}
 
 	defer response.Body.Close()
+	return nil
 }
 
 // ParseSlackParams Slackから送られたパラメータをパースする
@@ -54,12 +70,7 @@ func ParseSlackParams(rawParams interface{}) (result *SlackParams, err error) {
 		return
 	}
 	rawQueryString := tmp["body"].(string)
-	parsed, err := url.QueryUnescape(rawQueryString)
-	if err != nil {
-		err = errors.New("params body unescape failed. body: " + rawQueryString)
-		return
-	}
-	params, err := url.ParseQuery(parsed)
+	params, err := url.ParseQuery(rawQueryString)
 	if err != nil {
 		err = errors.New("params body parse failed. body: " + rawQueryString)
 		return
